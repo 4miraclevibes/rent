@@ -19,7 +19,7 @@
             <ul class="menu-inner py-1 mt-3 border-top">
                 <!-- Dashboard -->
                 <li class="menu-item {{ Route::is('dashboard') ? 'active' : '' }}">
-                    <a href="{{ route('dashboard') }}" class="menu-link">
+                    <a href="{{ route('cars') }}" class="menu-link">
                         <i class="menu-icon tf-icons bx bxs-home"></i>
                         <div data-i18n="Dashboard">Dashboard</div>
                     </a>
