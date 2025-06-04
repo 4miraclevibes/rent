@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Car;
-
+use Carbon\Carbon;
 class OrderController extends Controller
 {
     public function index()
@@ -18,7 +18,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-        'car_id' => 'required|exists:cars,id',
+            'car_id' => 'required|exists:cars,id',
             'order_date' => 'required',
             'pickup_date' => 'required',
             'dropoff_date' => 'required',
@@ -26,14 +26,13 @@ class OrderController extends Controller
             'dropoff_location' => 'required',
         ]);
 
+        $car = Car::find($request->car_id)->with('orders')->first();
+        $orders = Order::where('car_id', $car->id)->whereBetween('pickup_date', [$request->pickup_date, $request->dropoff_date])->get();
+        if($orders->count() > 0){
+            return redirect()->route('orders.index')->with('error', 'Car is already rented');
+        }
+
         $data = $request->all();
-        // Saya tidak begitu tahu dengan aturan rental, jadi saya search, kurang lebih kondisi nya sperti ini
-        if($data['order_date'] < $data['pickup_date']){
-            return redirect()->route('orders.index')->with('error', 'Order date must be before pickup date');
-        }
-        if($data['pickup_date'] < $data['dropoff_date']){
-            return redirect()->route('orders.index')->with('error', 'Pickup date must be before dropoff date');
-        }
         Order::create($data);
         return redirect()->route('orders.index')->with('success', 'Order created successfully');
     }
